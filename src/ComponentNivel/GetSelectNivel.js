@@ -34,8 +34,8 @@ const GetSelectNivel = () => {
   { name:"categoria",label:"CATEGORIA",disablePadding: false},
   { name:"claveCategoria",label:"CLAVE CATEGORIA",disablePadding: false}];
   const options = {
- 
-};
+   
+  };
  
  let datass =[];
  DatosVacancia.map((tabla)=>{

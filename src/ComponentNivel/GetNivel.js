@@ -5,12 +5,12 @@ const GetNivel = () => {
   return (
     <>
  	<div className="container">	
-        <img src='../logos_nuevos.png' className='img-responsive' />
+        <img src='logos_nuevos.png' className='img-responsive' />
     </div>
      <GetSelectNivel/>
      <br /><br />
     <div>
-			<img src='../pleca_nueva20.png' width="100%" />				
+			<img src='pleca_nueva20.png' width="100%" />				
 	</div>
     </>
   )
