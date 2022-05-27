@@ -35,7 +35,9 @@ const GetSelectNivel = () => {
   { name:"claveCategoria",label:"CLAVE CATEGORIA",disablePadding: false}];
   const options = {
    filterType:"dropdown",
-   responsive:"scroll"
+   responsive:"scroll",
+   selectableRows: false,
+   
   };
  
  let datass =[];
