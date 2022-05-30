@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import GetNivel from './ComponentNivel/GetNivel';
+import { AppRouter } from './router/AppRouter';
 import './index.css';
 
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-     <GetNivel/>
+     <AppRouter/>
 );
 
 
