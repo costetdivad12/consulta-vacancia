@@ -26,7 +26,7 @@ export const AppRouter = () => {
         <Router>
             <div>
                 <div className="container mb-3">
-                    <img src={process.env.PUBLIC_URL + '/img/logos_nuevos.png'} className='img-responsive' alt='logo' />
+                    <img src={process.env.PUBLIC_URL + './img/logos_nuevos.png'} className='img-responsive' alt='logo' />
                 </div>
                 <div className='container'>
                     <Switch>
@@ -35,8 +35,8 @@ export const AppRouter = () => {
                         <Redirect to='/public/vacancia' />
                     </Switch>
                 </div>
-                <div className='fixed-bottom'>
-                    <img src={process.env.PUBLIC_URL + '/img/pleca_nueva20.png'} width="100%" alt='logo' />
+                <div >
+                    <img src={process.env.PUBLIC_URL + './img/pleca_nueva20.png'} width="100%" alt='logo' />
                 </div>
             </div>
         </Router>

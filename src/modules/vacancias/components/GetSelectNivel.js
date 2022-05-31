@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { api } from "../../../api";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
@@ -15,10 +16,22 @@ const GetSelectNivel = () => {
 
   const [Selects, setSelect] = useState([]);
   const [chageSelect, setchageSelect] = useState("");
+  const [SelectsTipoVacancia, setSelectsTipoVacancia] = useState([]);
+  const [SelectsTipoVacanciaresult, setSelectsTipoVacanciaresult] = useState([]);
   const [SelectsMuni, setSelectsMuni] = useState([]);
   const [chageSelectMuni, setchageSelectMuni] = useState("");
   const [DatosVacancia, setDatosVacancia] = useState([]);
+
+  
+  
+  
+  
   const [chageSelectTipo, setchageSelectTipo] = useState("");
+
+
+  // mostrar y ocultar
+  const [showTipo, setshowTipo] = useState(false);
+  const [showTipoMuni, setshowTipoMuni] = useState(false);
   const columns = [
     { name:"cct", label:"CCT",disablePadding: false},
   { name:"zonaEscolar",label:"ZONA ESCOLAR",disablePadding: false},
@@ -33,6 +46,7 @@ const GetSelectNivel = () => {
   //label:"APELLIDO MATERNO"},
   { name:"categoria",label:"CATEGORIA",disablePadding: false},
   { name:"claveCategoria",label:"CLAVE CATEGORIA",disablePadding: false}];
+
   const options = {
    filterType:"dropdown",
    responsive:"scroll",
@@ -41,14 +55,14 @@ const GetSelectNivel = () => {
   };
  
  let datass =[];
- DatosVacancia.map((tabla)=>{
+ DatosVacancia.forEach((tabla)=>{
 
-    datass=[{
+    datass.push({
         cct:tabla.cct,
         zonaEscolar:tabla.zonaEscolar,
         sector:tabla.sector,
         turno:tabla.turno,
-        tipoVacancia:tabla.tipoVacancia===1?'DIRECTOR':'DOCENTE',
+        tipoVacancia:tabla.tipoVacanciaId===1?'DOCENTE':tabla.tipoVacanciaId===2?'DIRECTIVA':'SUPERVISIÓN',
         plazaFormatoFone:tabla.teacher.plazaFormatoFone,
        // rfc:tabla.teacher.rfc,
         //nombre:tabla.teacher.nombre,
@@ -56,60 +70,62 @@ const GetSelectNivel = () => {
         //apellidoMaterno:tabla.teacher.apellidoMaterno,
         categoria:tabla.teacher.categoria,
         claveCategoria:tabla.teacher.claveCategoria
-    }];
+    });
      
  });
  
-  const getData = () => {
-    const data = "https://serviciosweb.iebem.edu.mx:7001/education/level";
-    axios.get(data).then((resp) => {
-      //    console.log(resp.data);
+  const getData = async() => {
+    await api.get("/education/level").then((resp) => {
+        
       const datas = resp.data;
       setSelect(datas);
+     
+
     });
+    
   };
 
-  const handleSelectChage = (e) => {
+  const handleSelectChage = async(e) => {
     
-    const id_muni = e.target.value;
-    setchageSelect(id_muni);
-    
-    const municipios = `https://serviciosweb.iebem.edu.mx:7001/ubication/ct/level/${id_muni}`;
+    const id_nivel = e.target.value;
+    setchageSelect(id_nivel);
 
-    axios.get(municipios).then((resp) => {
-    //   console.log(resp.data);
+    await api.get(`/vacancy/type/level/${id_nivel}`).then((resp) => {
+      
+      const datostipovacancia = resp.data;
+      setSelectsTipoVacancia(datostipovacancia);
+      setshowTipo(true);
+      setSelectsTipoVacanciaresult("");
+      setchageSelectMuni("");
+
+  });    
+   
+  };
+
+  const handleSelectChangeTipo=async(e)=>{
+    const id_tipo = e.target.value;
+    
+    setSelectsTipoVacanciaresult(id_tipo) 
+    await api.get(`/ubication/ct/level/${chageSelect}/type/${id_tipo}`).then((resp) => {
+      
       const datosMuni = resp.data;
       setSelectsMuni(datosMuni);
-      setchageSelectTipo("");
-    setchageSelectMuni("");
-    });
-  };
-
-   
-  const handleSelectChageMuni1 = (e) => {
-    const id_tipo = e.target.value;
-    setchageSelectTipo(id_tipo);
-    setchageSelectMuni("");
-    
-    
-  }
-
-  const handleSelectChageMuni = (e) => {
-    const id_mu = e.target.value;
-    console.log(id_mu)
-    setchageSelectMuni(id_mu);
-    const datoss = `https://serviciosweb.iebem.edu.mx:7001/vacancy/type/${chageSelectTipo}/level/${chageSelect}/ubication/${id_mu}`;
-    axios.get(datoss).then((resp) => {
-        const datos_vacancia=resp.data;
-        
-        setDatosVacancia(datos_vacancia);
-
-        
-        
-      });
+      setshowTipoMuni(true)
+      setchageSelectMuni("");
+  });
 
   };
-  
+
+  const handleSelectChangeTipoMuni = async (e)=>{
+    const id_tipo_muni = e.target.value;
+ 
+    setchageSelectMuni(id_tipo_muni);
+    await api.get(`/vacancy/type/${SelectsTipoVacanciaresult}/level/${chageSelect}/ubication/${id_tipo_muni}`).then((resp) => {
+      console.log(resp.data);
+      const datosTabla = resp.data;
+      setDatosVacancia(datosTabla);
+  });
+  };  
 
   useEffect(() => {
     getData();
@@ -137,37 +153,43 @@ const GetSelectNivel = () => {
               ))}
             </Select>
           </FormControl>
-        {/* </Box>         */}
-        <FormControl sx={{ m: 1, minWidth: 150 }}>
+          {showTipo? ( <FormControl sx={{m:1, minWidth: 150 }}>
             <InputLabel id="demo-simple-select-label">Tipo</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={chageSelectTipo}
+              value={SelectsTipoVacanciaresult}
               label="tipo"
-              onChange={handleSelectChageMuni1}
+              onChange={handleSelectChangeTipo}
             >
-              <MenuItem key={1} value={1}>DIRECTIVO</MenuItem>
-              <MenuItem key={2} value={2}>DOCENTE</MenuItem>
+              {SelectsTipoVacancia.map((resp) => (
+                // <li key={id}>{title}</li>
+                <MenuItem key={resp.id} value={resp.id} >
+                  {resp.nombre}
+                </MenuItem>
+              ))}
             </Select>
-          </FormControl>
-        
-      {/* <Box sx={{ minWidth: 80 }}> */}
-          <FormControl sx={{ m: 1, minWidth: 150 }}>
+          </FormControl> ) :('') }
+
+          {showTipoMuni? ( <FormControl sx={{m:1, minWidth: 150 }}>
             <InputLabel id="demo-simple-select-label">Municipio</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={chageSelectMuni}
-              label="Nivel"
-              onChange={handleSelectChageMuni}
+              label="muni"
+              onChange={handleSelectChangeTipoMuni}
             >
               {SelectsMuni.map((resp) => (
                 // <li key={id}>{title}</li>
-                <MenuItem key={resp.clave} value={resp.clave}>{resp.municipio}</MenuItem>
+                <MenuItem key={resp.clave} value={resp.clave} >
+                  {resp.municipio}
+                </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControl> ) :('') }
+          
+      
 
           
          
