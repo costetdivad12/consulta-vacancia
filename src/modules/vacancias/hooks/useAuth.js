@@ -5,8 +5,9 @@ import { googleAuthProvider } from "../auth/firebase/firebase";
 const useAuth = () => {
 
     const [checking, setChecking ] = useState(true);
+    const [userGoogle, setUserGoogle] = useState({});
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+    let aux={};
     useEffect(() => {
         const auth = getAuth();
         auth.onAuthStateChanged( async (user) => {
@@ -16,6 +17,7 @@ const useAuth = () => {
                 setIsLoggedIn(false);
             }
             setChecking(false);
+            setUserGoogle(user);
         });
     }, [ checking ] );
 
@@ -23,13 +25,15 @@ const useAuth = () => {
     const login = async () => {
         const auth = getAuth();
         const { user } = await signInWithPopup(auth, googleAuthProvider);
+    
         if (user) {
             const domain = user.email.split('@');
             if (domain[1] !== 'iebem.edu.mx')  return true;
 
         }
+        
     }
-
+    
     const logout = async () => {
         const auth = getAuth();
         await auth.signOut();
@@ -39,7 +43,8 @@ const useAuth = () => {
         login,
         logout,
         checking,
-        isLoggedIn
+        isLoggedIn,
+        userGoogle
     }
 
 
